@@ -2,40 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>Test</title>
-	<link href="//serverapi.arcgisonline.com/jsapi/arcgis/3.5/js/esri/css/esri.css" rel="stylesheet" />
-	<style>
-html, body, #map, .map.container {
-	padding:0;
-	margin:0;
-	height:100%;
-}
-ul, li {
-	padding: 0;
-	margin: 0;
-}
-#layers {
-	position: absolute;
-	top: 0;
-	right: 0;
-	z-index: 1;
-	background-color: white;
-
-	margin-top: 1em;
-	margin-right: 1em;
-	padding: 0.3em;
-}
-#layers ul {
-	list-style-type: none;
-	list-style-position: inside;
-	padding: 0;
-}
-progress {
-	position: absolute;
-	bottom: 50%;
-	left: 50%;
-	z-index: 1;
-}
-	</style>
+	<link href="//serverapi.arcgisonline.com/jsapi/arcgis/3.5compact/js/esri/css/esri.css" rel="stylesheet" />
+	<link href="Style/index.css" rel="stylesheet" />
 </head>
 <body>
 	<div id="map">
@@ -46,8 +14,18 @@ progress {
 		</div>
 		<progress id="mapProgress">Updating map...</progress>
 	</div>
-	<script data-dojo-config="{async: true}"></script>
-	<script src="//serverapi.arcgisonline.com/jsapi/arcgis/3.5"></script>
+	<script>
+		var dojoConfig = {
+			async: true,
+			packages: [
+				{
+					name: "wsdot",
+					location: "/Scripts/wsdot"
+				}
+			]
+		};
+	</script>
+	<script src="//serverapi.arcgisonline.com/jsapi/arcgis/3.5compact"></script>
 	<script src="Scripts/index.js"></script>
 </body>
 </html>

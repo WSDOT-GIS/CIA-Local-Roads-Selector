@@ -70,6 +70,8 @@
   <ItemGroup>
     <Content Include="index.html" />
     <Content Include="Scripts\index.js" />
+    <Content Include="Scripts\wsdot\tasks\intersectionLocator.js" />
+    <Content Include="Style\index.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -99,6 +101,7 @@
   <ItemGroup>
     <Content Include="ReverseGeocodeIntersection.ashx" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

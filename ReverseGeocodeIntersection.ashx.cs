@@ -124,7 +124,11 @@ namespace ArcGisSecureServicesTest
 			PointN point;
 			if (!TryParse(context.Request.Params["location"], out point))
 			{
-				throw new ArgumentException("The location parameter was not provided.");
+				// Exit with an error message if a location was not provided.
+				context.Response.StatusCode = 400;
+				context.Response.Write(string.Format("{{\"error\":\"{0}\"}}", "The location parameter was not provided."));
+				context.Response.ContentType = "application/json";
+				return;
 			}
 
 			// If an input spatial reference has been specified, add that information to the point.
