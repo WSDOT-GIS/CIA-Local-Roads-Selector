@@ -72,10 +72,11 @@ define([
 			});
 
 			deferred.then(function (json) {
+				var addressCandidate = jsonToAddressCandidate(json);
 				if (callback) {
-					callback(jsonToAddressCandidate(json));
+					callback(addressCandidate);
 				}
-				self._emitIntersectionLocated(json);
+				self._emitIntersectionLocated(addressCandidate);
 			}, function (error) {
 				if (errback) {
 					errback(error);
