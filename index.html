@@ -6,13 +6,15 @@
 	<link href="Style/index.css" rel="stylesheet" />
 </head>
 <body>
-	<div id="map">
-		<div id="layers">
-			<ul>
-				<li><input type="checkbox" id="trafficCheckbox" /><label for="trafficCheckbox">Traffic</label></li>
-			</ul>
+	<div id="borderContainer">
+		<div id="mapPane">
+			<div id="map">
+				<progress id="mapProgress">Updating map...</progress>
+			</div>
 		</div>
-		<progress id="mapProgress">Updating map...</progress>
+		<div id="listPane">
+
+		</div>
 	</div>
 	<script>
 		var dojoConfig = {

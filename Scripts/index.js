@@ -1,6 +1,8 @@
 ﻿/*global require*/
 /*jslint browser:true, white:true*/
 require(["dojo/on",
+	"dijit/layout/BorderContainer",
+	"dijit/layout/ContentPane",
 	"esri/urlUtils",
 	"esri/map",
 	"esri/geometry/Point",
@@ -18,13 +20,37 @@ require(["dojo/on",
 	"esri/tasks/FeatureSet",
 	"esri/units",
 	"dojo/_base/connect",
-	"wsdot/tasks/intersectionLocator"],
-	function (on, urlUtils, Map, Point, GraphicsLayer, RouteTask, SimpleRenderer, SimpleMarkerSymbol,
+	"wsdot/tasks/intersectionLocator", "dojo/domReady!"],
+	function (on, BorderContainer, ContentPane, urlUtils, Map, Point, GraphicsLayer, RouteTask, SimpleRenderer, SimpleMarkerSymbol,
 		SimpleLineSymbol, Graphic, InfoTemplate, Basemap, BasemapLayer, ArcGISDynamicMapServiceLayer,
 		RouteParameters, FeatureSet, Units, connect,
 		IntersectionLocator) {
 		"use strict";
 		var map, locator, routeTask, stopsLayer, routesLayer, protocol, trafficLayer;
+
+		function setupBorderContainer() {
+			var bc, mapPane, listPane;
+
+			bc = new BorderContainer({
+				style: "width: 100%; height: 100%;"
+			}, "borderContainer");
+
+			mapPane = new ContentPane({
+				region: "center",
+				id: "mapPane"
+			}, "mapPane");
+			bc.addChild(mapPane);
+
+			listPane = new ContentPane({
+				region: "right",
+				id: "listPane"
+			}, "listPane");
+			bc.addChild(listPane);
+
+			bc.startup();
+		}
+
+		setupBorderContainer();
 
 		// Store the protocol (e.g., "https:")
 		protocol = window.location.protocol;
@@ -90,25 +116,6 @@ require(["dojo/on",
 					window.console.error(error);
 				});
 			}
-
-			on(document.getElementById("trafficCheckbox"), "click", function (e) {
-				if (this.checked) {
-					if (!trafficLayer) {
-						trafficLayer = new ArcGISDynamicMapServiceLayer(protocol + "//traffic.arcgis.com/arcgis/rest/services/World/Traffic/MapServer", {
-							id: "traffic"
-						});
-						map.addLayer(trafficLayer);
-					}
-					trafficLayer.show();
-				} else {
-					if (trafficLayer) {
-						trafficLayer.hide();
-					}
-				}
-			});
-
-
-			
 
 			// Disable zooming on map double-click.  Double click will be used to create a route.
 			map.disableDoubleClickZoom();
