@@ -32,7 +32,8 @@ require(["dojo/on",
 			var bc, mapPane, listPane;
 
 			bc = new BorderContainer({
-				style: "width: 100%; height: 100%;"
+				gutters: false,
+				design: "sidebar"
 			}, "borderContainer");
 
 			mapPane = new ContentPane({
@@ -43,7 +44,8 @@ require(["dojo/on",
 
 			listPane = new ContentPane({
 				region: "right",
-				id: "listPane"
+				id: "listPane",
+				splitter: true
 			}, "listPane");
 			bc.addChild(listPane);
 
