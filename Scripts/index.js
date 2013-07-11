@@ -137,7 +137,8 @@ require([
 			
 			tree = new Tree({
 				id: "routesTree",
-				model: routesModel
+				model: routesModel,
+				showRoot: false
 			}, "tree");
 
 			bc.startup();
