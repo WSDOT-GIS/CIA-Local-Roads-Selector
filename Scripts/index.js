@@ -42,6 +42,7 @@ require([
 			}
 		});
 
+
 		routesStore = new Observable(routesStore);
 
 		routesModel = new ObjectStoreModel({
@@ -164,8 +165,8 @@ require([
 			stopsLayer.setRenderer(new SimpleRenderer(symbol));
 			map.addLayer(stopsLayer);
 
-			// DEBUG
-			window.stopsLayer = stopsLayer;
+			//// DEBUG
+			//window.stopsLayer = stopsLayer;
 
 			// Create the routes graphics layer.
 			routesLayer = new GraphicsLayer({
@@ -178,8 +179,8 @@ require([
 			routesLayer.setRenderer(new SimpleRenderer(symbol));
 			map.addLayer(routesLayer);
 
-			// DEBUG
-			window.routesLayer = routesLayer;
+			//// DEBUG
+			//window.routesLayer = routesLayer;
 
 			// Setup the locator.
 			locator = new IntersectionLocator(protocol + "ReverseGeocodeIntersection.ashx");
@@ -244,6 +245,14 @@ require([
 								}
 
 								routesLayer.add(routeGraphic);
+
+								// Add item to the store for the route.
+								routesStore.add({
+									id: routeGraphic.attributes.Name,
+									name: routeGraphic.attributes.Name,
+									graphic: routeGraphic,
+									parent: "root"
+								});
 							}
 						}
 
