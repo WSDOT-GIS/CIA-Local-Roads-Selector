@@ -30,6 +30,38 @@ require([
 		"use strict";
 		var map, locator, routeTask, stopsLayer, routesLayer, protocol, mapPane, listPane, routesStore, routesModel;
 
+		/** Converts the route name returned from the route task to a shorter name, omitting city, state, and ZIP info.
+		 * @param {String} routeName E.g., "State Ave NW & Capitol Way N, Olympia, WA  98501 - State Ave NE & Adams St NE, Olympia, WA  98501"
+		 * @returns {String}
+		 */
+		function createName(routeName) {
+			var r = /([^&]+)\s+&\s+([^&,]+),\s+.+\d+\s+\-\s+([^&]+)\s+&\s+([^&,]+),\s+.+\s*\d+/, m, start1, start2, end1, end2, output;
+			m = routeName.match(r);
+			if (m) {
+				start1 = m[1];
+				start2 = m[2];
+				end1 = m[3];
+				end2 = m[4];
+
+				if (start1 === end1) {
+					output = [start1, "from", start2, "to", end2].join(" ");
+				} else if (start1 === end2) {
+					output = [start1, "from", start2, "to", end1].join(" ");
+
+				} else if (start2 === end1) {
+					output = [start2, "from", start1, "to", end2].join(" ");
+
+				} else if (start2 === end2) {
+					output = [start2, "from", start1, "to", end1].join(" ");
+
+				} else {
+					output = [start1, "&", start2, "-", end1, "&", end2].join(" ");
+				}
+
+				return output;
+			}
+		}
+
 		routesStore = new Memory({
 			data: [{
 				id: "root",
@@ -219,6 +251,7 @@ require([
 					routeParams.returnDirections = false;
 					routeParams.directionsLengthUnits = Units.MILES;
 					routeParams.outSpatialReference = map.spatialReference;
+					routeParams.restrictionAttributes = ["none"];
 
 					routeTask.solve(routeParams, function (solveResults) {
 						/* 
@@ -249,7 +282,7 @@ require([
 								// Add item to the store for the route.
 								routesStore.add({
 									id: routeGraphic.attributes.Name,
-									name: routeGraphic.attributes.Name,
+									name: createName(routeGraphic.attributes.Name),
 									graphic: routeGraphic,
 									parent: "root"
 								});
