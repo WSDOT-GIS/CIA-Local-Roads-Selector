@@ -1,6 +1,6 @@
 ﻿/*global require*/
 /*jslint browser:true, white:true*/
-require(["dojo/on",
+require([
 	"dijit/layout/BorderContainer",
 	"dijit/layout/ContentPane",
 	"esri/urlUtils",
@@ -15,21 +15,22 @@ require(["dojo/on",
 	"esri/InfoTemplate",
 	"esri/dijit/Basemap",
 	"esri/dijit/BasemapLayer",
-	"esri/layers/ArcGISDynamicMapServiceLayer",
 	"esri/tasks/RouteParameters",
 	"esri/tasks/FeatureSet",
 	"esri/units",
 	"dojo/_base/connect",
 	"wsdot/tasks/intersectionLocator", "dojo/domReady!"],
-	function (on, BorderContainer, ContentPane, urlUtils, Map, Point, GraphicsLayer, RouteTask, SimpleRenderer, SimpleMarkerSymbol,
-		SimpleLineSymbol, Graphic, InfoTemplate, Basemap, BasemapLayer, ArcGISDynamicMapServiceLayer,
+	function (BorderContainer, ContentPane, urlUtils, Map, Point, GraphicsLayer, RouteTask, SimpleRenderer, SimpleMarkerSymbol,
+		SimpleLineSymbol, Graphic, InfoTemplate, Basemap, BasemapLayer,
 		RouteParameters, FeatureSet, Units, connect,
 		IntersectionLocator) {
 		"use strict";
-		var map, locator, routeTask, stopsLayer, routesLayer, protocol, trafficLayer;
+		var map, locator, routeTask, stopsLayer, routesLayer, protocol, mapPane, listPane;
 
+		/** Sets up the border container layout for the page.
+		 */
 		function setupBorderContainer() {
-			var bc, mapPane, listPane;
+			var bc;
 
 			bc = new BorderContainer({
 				gutters: false,
@@ -132,6 +133,9 @@ require(["dojo/on",
 			stopsLayer.setRenderer(new SimpleRenderer(symbol));
 			map.addLayer(stopsLayer);
 
+			// DEBUG
+			window.stopsLayer = stopsLayer;
+
 			// Create the routes graphics layer.
 			routesLayer = new GraphicsLayer({
 				id: "routes"
@@ -142,6 +146,9 @@ require(["dojo/on",
 			symbol.setWidth(10);
 			routesLayer.setRenderer(new SimpleRenderer(symbol));
 			map.addLayer(routesLayer);
+
+			// DEBUG
+			window.routesLayer = routesLayer;
 
 			// Setup the locator.
 			locator = new IntersectionLocator(protocol + "ReverseGeocodeIntersection.ashx");
@@ -192,10 +199,20 @@ require(["dojo/on",
 						{Graphic} routeResult.route
 						{string} routeResult.routeName
 						*/
-						var i, l;
+						var i, l, j, jl, routeGraphic;
 						if (solveResults && solveResults.routeResults && solveResults.routeResults.length) {
 							for (i = 0, l = solveResults.routeResults.length; i < l; i += 1) {
-								routesLayer.add(solveResults.routeResults[i].route);
+								routeGraphic = solveResults.routeResults[i].route;
+
+								// Add stops attribute to route graphic
+								routeGraphic.attributes.stops = [];
+								// Loop through the stops layer and add the stop point graphics 
+								// to the "stops" attribute of the route graphic.
+								for (j = 0, jl = stopsLayer.graphics.length; j < jl; j += 1) {
+									routeGraphic.attributes.stops.push(stopsLayer.graphics[j]);
+								}
+
+								routesLayer.add(routeGraphic);
 							}
 						}
 
