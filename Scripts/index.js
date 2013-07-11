@@ -1,7 +1,8 @@
 ﻿/*global require*/
 /*jslint browser:true, white:true, regexp:true*/
 require([
-	"dojo/aspect",
+	"dojo/on",
+	// "dojo/aspect",
 	"dijit/layout/BorderContainer",
 	"dijit/layout/ContentPane",
 	"esri/urlUtils",
@@ -22,13 +23,13 @@ require([
 	"wsdot/tasks/intersectionLocator",
 	"dojo/store/Memory", "dojo/store/Observable", "dijit/tree/ObjectStoreModel", "dijit/Tree",
 	"dojo/domReady!"],
-	function (aspect, BorderContainer, ContentPane, urlUtils, Map, Point, GraphicsLayer, RouteTask, SimpleRenderer, SimpleMarkerSymbol,
+	function (on, /*aspect,*/ BorderContainer, ContentPane, urlUtils, Map, Point, GraphicsLayer, RouteTask, SimpleRenderer, SimpleMarkerSymbol,
 		SimpleLineSymbol, Graphic, InfoTemplate, Basemap, BasemapLayer,
 		RouteParameters, FeatureSet, Units,
 		IntersectionLocator,
 		Memory, Observable, ObjectStoreModel, Tree) {
 		"use strict";
-		var map, locator, routeTask, stopsLayer, routesLayer, protocol, routesStore, routesModel;
+		var map, locator, routeTask, stopsLayer, routesLayer, protocol, routesStore, routesModel, tree;
 
 		/** Converts the route name returned from the route task to a shorter name, omitting city, state, and ZIP info.
 		 * @param {String} routeName E.g., "State Ave NW & Capitol Way N, Olympia, WA  98501 - State Ave NE & Adams St NE, Olympia, WA  98501"
@@ -82,21 +83,21 @@ require([
 			store: routesStore
 		});
 
-		aspect.after(routesModel, "onChange", function (item) {
-			console.debug("change", item);
-		});
+		////aspect.after(routesModel, "onChange", function (item) {
+		////	console.debug("change", item);
+		////});
 
-		aspect.after(routesModel, "onChildrenChange", function (parent, newChildrenList) {
-			console.debug("children-change", {
-				parent: parent,
-				newChildrenList: newChildrenList
-			});
-		});
+		////aspect.after(routesModel, "onChildrenChange", function (parent, newChildrenList) {
+		////	console.debug("children-change", {
+		////		parent: parent,
+		////		newChildrenList: newChildrenList
+		////	});
+		////});
 
 		/** Sets up the border container layout for the page.
 		 */
 		function setupBorderContainer() {
-			var bc, mapPane, listPane, listContainer, treePane, treeToolsPane, tree;
+			var bc, mapPane, listPane, listContainer, treePane, treeToolsPane;
 
 			bc = new BorderContainer({
 				gutters: false,
@@ -186,11 +187,11 @@ require([
 			showAttribution: true
 		});
 
-		aspect.after(map, "onUpdateStart", function () {
+		map.on("update-start", function () {
 			document.getElementById("mapProgress").hidden = false;
 		});
 
-		aspect.after(map, "onUpdateEnd", function () {
+		map.on("update-end", function () {
 			document.getElementById("mapProgress").hidden = true;
 		});
 
@@ -315,11 +316,36 @@ require([
 						}
 
 						stopsLayer.clear();
-						window.console.log(solveResults);
+						//window.console.log(solveResults);
 					}, routeParams, function (error) {
-						window.console.error(error);
+						if (window.console) {
+							window.console.error(error);
+						}
 					});
 				}
+			});
+
+			on(document.getElementById("deleteButton"), "click", function () {
+				var selectedItems, item, i, l, idsToRemove = [], id;
+
+				selectedItems = tree.selectedItems;
+
+				// Create a list of IDs to remove.
+				for (i = 0, l = selectedItems.length; i < l; i += 1) {
+					item = selectedItems[i];
+					if (item.id !== "root") {
+						idsToRemove.push(item.id);
+						// Delete the associated graphic.
+						routesLayer.remove(item.graphic);
+					}
+				}
+
+				// Remove the IDs.
+				for (i = 0, l = idsToRemove.length; i < l; i += 1) {
+					id = idsToRemove[i];
+					routesStore.remove(id);
+				}
+				
 			});
 		});
 	});
