@@ -1,6 +1,7 @@
 ﻿/*global require*/
-/*jslint browser:true, white:true*/
+/*jslint browser:true, white:true, regexp:true*/
 require([
+	"dojo/aspect",
 	"dijit/layout/BorderContainer",
 	"dijit/layout/ContentPane",
 	"esri/urlUtils",
@@ -18,17 +19,16 @@ require([
 	"esri/tasks/RouteParameters",
 	"esri/tasks/FeatureSet",
 	"esri/units",
-	"dojo/_base/connect",
 	"wsdot/tasks/intersectionLocator",
 	"dojo/store/Memory", "dojo/store/Observable", "dijit/tree/ObjectStoreModel", "dijit/Tree",
 	"dojo/domReady!"],
-	function (BorderContainer, ContentPane, urlUtils, Map, Point, GraphicsLayer, RouteTask, SimpleRenderer, SimpleMarkerSymbol,
+	function (aspect, BorderContainer, ContentPane, urlUtils, Map, Point, GraphicsLayer, RouteTask, SimpleRenderer, SimpleMarkerSymbol,
 		SimpleLineSymbol, Graphic, InfoTemplate, Basemap, BasemapLayer,
-		RouteParameters, FeatureSet, Units, connect,
+		RouteParameters, FeatureSet, Units,
 		IntersectionLocator,
 		Memory, Observable, ObjectStoreModel, Tree) {
 		"use strict";
-		var map, locator, routeTask, stopsLayer, routesLayer, protocol, mapPane, listPane, routesStore, routesModel;
+		var map, locator, routeTask, stopsLayer, routesLayer, protocol, routesStore, routesModel;
 
 		/** Converts the route name returned from the route task to a shorter name, omitting city, state, and ZIP info.
 		 * @param {String} routeName E.g., "State Ave NW & Capitol Way N, Olympia, WA  98501 - State Ave NE & Adams St NE, Olympia, WA  98501"
@@ -75,16 +75,28 @@ require([
 		});
 
 
+
 		routesStore = new Observable(routesStore);
 
 		routesModel = new ObjectStoreModel({
 			store: routesStore
 		});
 
+		aspect.after(routesModel, "onChange", function (item) {
+			console.debug("change", item);
+		});
+
+		aspect.after(routesModel, "onChildrenChange", function (parent, newChildrenList) {
+			console.debug("children-change", {
+				parent: parent,
+				newChildrenList: newChildrenList
+			});
+		});
+
 		/** Sets up the border container layout for the page.
 		 */
 		function setupBorderContainer() {
-			var bc, tree;
+			var bc, mapPane, listPane, listContainer, treePane, treeToolsPane, tree;
 
 			bc = new BorderContainer({
 				gutters: false,
@@ -97,24 +109,37 @@ require([
 			}, "mapPane");
 			bc.addChild(mapPane);
 
-			tree = new Tree({
-				id: "routesTree",
-				model: routesModel
-			});
 
 			listPane = new ContentPane({
 				region: "right",
 				id: "listPane",
-				splitter: true,
-				content: tree.domNode
+				splitter: true
 			}, "listPane");
 			bc.addChild(listPane);
+
+			listContainer = new BorderContainer({
+				design: "headline",
+				gutters: false
+			}, "listContainer");
+
+			treePane = new ContentPane({
+				region: "center"
+			}, "treePane");
+			listContainer.addChild(treePane);
+
+			treeToolsPane = new ContentPane({
+				region: "bottom"
+			}, "treeToolsPane");
+			listContainer.addChild(treeToolsPane);
+
+			listContainer.startup();
 			
+			tree = new Tree({
+				id: "routesTree",
+				model: routesModel
+			}, "tree");
+
 			bc.startup();
-
-
-
-			
 		}
 
 		setupBorderContainer();
@@ -161,11 +186,11 @@ require([
 			showAttribution: true
 		});
 
-		connect.connect(map, "onUpdateStart", function () {
+		aspect.after(map, "onUpdateStart", function () {
 			document.getElementById("mapProgress").hidden = false;
 		});
 
-		connect.connect(map, "onUpdateEnd", function () {
+		aspect.after(map, "onUpdateEnd", function () {
 			document.getElementById("mapProgress").hidden = true;
 		});
 
