@@ -19,18 +19,39 @@ require([
 	"esri/tasks/FeatureSet",
 	"esri/units",
 	"dojo/_base/connect",
-	"wsdot/tasks/intersectionLocator", "dojo/domReady!"],
+	"wsdot/tasks/intersectionLocator",
+	"dojo/store/Memory", "dojo/store/Observable", "dijit/tree/ObjectStoreModel", "dijit/Tree",
+	"dojo/domReady!"],
 	function (BorderContainer, ContentPane, urlUtils, Map, Point, GraphicsLayer, RouteTask, SimpleRenderer, SimpleMarkerSymbol,
 		SimpleLineSymbol, Graphic, InfoTemplate, Basemap, BasemapLayer,
 		RouteParameters, FeatureSet, Units, connect,
-		IntersectionLocator) {
+		IntersectionLocator,
+		Memory, Observable, ObjectStoreModel, Tree) {
 		"use strict";
-		var map, locator, routeTask, stopsLayer, routesLayer, protocol, mapPane, listPane;
+		var map, locator, routeTask, stopsLayer, routesLayer, protocol, mapPane, listPane, routesStore, routesModel;
+
+		routesStore = new Memory({
+			data: [{
+				id: "root",
+				name: "routes"
+			}],
+			getChildren: function (object) {
+				// Add a getChildren() method to store for the data model where
+				// children objects point to their parent (aka relational model)
+				return this.query({ parent: object.id });
+			}
+		});
+
+		routesStore = new Observable(routesStore);
+
+		routesModel = new ObjectStoreModel({
+			store: routesStore
+		});
 
 		/** Sets up the border container layout for the page.
 		 */
 		function setupBorderContainer() {
-			var bc;
+			var bc, tree;
 
 			bc = new BorderContainer({
 				gutters: false,
@@ -43,14 +64,24 @@ require([
 			}, "mapPane");
 			bc.addChild(mapPane);
 
+			tree = new Tree({
+				id: "routesTree",
+				model: routesModel
+			});
+
 			listPane = new ContentPane({
 				region: "right",
 				id: "listPane",
-				splitter: true
+				splitter: true,
+				content: tree.domNode
 			}, "listPane");
 			bc.addChild(listPane);
-
+			
 			bc.startup();
+
+
+
+			
 		}
 
 		setupBorderContainer();
