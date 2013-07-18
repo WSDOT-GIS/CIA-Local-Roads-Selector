@@ -20,6 +20,16 @@ namespace Proxy
 
 		public void ProcessRequest(HttpContext context)
 		{
+			// Ensure that referrer URL is from the same source as the request URL.
+			// Exit with an error if this is not the case.
+			if (context.Request.IsReferrerSameSite() != true)
+			{
+				context.Response.ContentType = "application/json";
+				context.Response.StatusCode = 403;
+				context.Response.StatusDescription = "Invalid referrer";
+				context.Response.Write("{\"error\":\"Invalid referrer.\"}");
+				return;
+			}
 
 			HttpResponse response = context.Response;
 
