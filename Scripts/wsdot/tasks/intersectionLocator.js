@@ -10,9 +10,9 @@ define([
 	"use strict";
 
 	/** Converts an object into an AddressCandidate.
-	 * @param json
-	 * @param json.address
-	 * @param json.location A JSON object representing a Point.
+	 * @param {Object} json
+	 * @param {string} json.address
+	 * @param {Object} json.location A JSON object representing a Point.
 	 * @returns {esri.tasks.AddressCandidate}
 	 */
 	function jsonToAddressCandidate(json) {
@@ -83,7 +83,6 @@ define([
 				}
 				self._emitIntersectionError(error);
 			});
-
 
 			return deferred;
 		}
