@@ -38,6 +38,32 @@ require([
 	function reduceRouteName(name) {
 		var output = name;
 		var streetAndCrossStreetRe = /(?:([^&]+)\s&\s+([^,]+),\s([^,]+),\s([a-z]+)\s+(\d+))\s-\s(?:(?:([^&]+)\s&\s+\1,\s\3,\s\4\s+\5)|(?:\1\s&\s+([^,]+),\s\3,\s\4\s+\5)|(?:([^&]+)\s&\s+\2,\s\3,\s\4\s+\5)|(?:\2\s&\s+([^,]+),\s\3,\s\4\s+\5))/i;
+
+		/**
+		 (?:
+			(?<street1>[^&]+)
+			\s&\s+
+			(?<street2>[^,]+)
+			,\s
+			(?<city>[^,]+)
+			,\s
+			(?<state>[a-z]+)
+			\s+
+			(?<zip>\d+)
+		)
+		\s-\s # Separator between intersections
+		(?:
+			(?:([^&]+)\s&\s+${street1},\s${city},\s${state}\s+${zip}) # capture 6 is the other cross street - if not undefined then street1 is the main street
+			|
+			(?:${street1}\s&\s+([^,]+),\s${city},\s${state}\s+${zip}) # capture 7 is the other cross street - if not undefined then street1 is the main street
+			|
+			(?:([^&]+)\s&\s+${street2},\s${city},\s${state}\s+${zip}) # capture 8 is the other cross street - if not undefined then street2 is the main street
+			|
+			(?:${street2}\s&\s+([^,]+),\s${city},\s${state}\s+${zip}) # capture 9 is the other cross street - if not undefined then street2 is the main street
+		)
+
+		*/
+
 		var match = name.match(streetAndCrossStreetRe);
 
 		var mainStreet, cross1, cross2, city, state, zip;
@@ -50,16 +76,16 @@ require([
 				cross1 = match[2];
 				cross2 = match[6];
 			} else if (match[7]) {
-				mainStreet = match[2];
-				cross1 = match[1];
-				cross2 = match[7];
-			} else if (match[8]) {
 				mainStreet = match[1];
 				cross1 = match[2];
-				cross2 = match[8];
-			} else {
+				cross2 = match[7];
+			} else if (match[8]) {
 				mainStreet = match[2];
 				cross1 = match[1];
+				cross2 = match[8];
+			} else {
+				mainStreet = match[1];
+				cross1 = match[2];
 				cross2 = match[9];
 			}
 
@@ -373,9 +399,7 @@ require([
 	}
 
 	/** Removes first graphic from the routes layer with a matching name.
-	 * @param {GraphicsLayer} layer
-	 * @param {string} attrName
-	 * @param {string} value
+	 * @param {string} name
 	 * @returns {Graphic}
 	 */
 	function deleteGraphicWithMatchingName(name) {
