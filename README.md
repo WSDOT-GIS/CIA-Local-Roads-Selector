@@ -118,10 +118,5 @@ This proxy is used to get ArcGIS REST resources. This handles the retrieval of t
 
 This project was created in Visual Studio 2013.
 
-## License ##
-Licensed under [The MIT License]. See the [LICENSE] file for details.
-
 [create OAuth Credentials]:http://resources.arcgis.com/en/help/arcgis-rest-api/#/Accessing_services_provided_by_Esri/02r300000268000000/
-[The MIT License]:http://opensource.org/licenses/MIT
-[LICENSE]:LICENSE
 [ArcGIS-JS-with-AJAX-Control-Toolkit]:https://github.com/WSDOT-GIS/ArcGIS-JS-with-AJAX-Control-Toolkit
