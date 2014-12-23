@@ -52,11 +52,14 @@ define([
 		*/
 		locationToIntersection: function (location, distance, callback, errback) {
 			var self = this, deferred, content;
+			location = location.toJson ? location.toJson() : location;
 
 			// Create content for request
 			content = {
-				location: [location.x, location.y].join(","),
-				distance: distance || 0
+				location: JSON.stringify(location),
+				distance: distance || 0,
+				returnIntersection: true,
+				f: "json"
 			};
 			if (location.spatialReference) {
 				content.inSR = location.spatialReference.wkid;
@@ -74,7 +77,8 @@ define([
 
 			deferred.then(function (json) {
 				if (callback) {
-					callback(jsonToAddressCandidate(json));
+					// callback(jsonToAddressCandidate(json));
+					callback(json);
 				}
 				self._emitIntersectionLocated(json);
 			}, function (error) {

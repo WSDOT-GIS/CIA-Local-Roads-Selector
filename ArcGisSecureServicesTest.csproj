@@ -85,9 +85,6 @@
       <DependentUpon>proxy.ashx</DependentUpon>
     </Compile>
     <Compile Include="ProxyConfig.cs" />
-    <Compile Include="ReverseGeocodeIntersection.ashx.cs">
-      <DependentUpon>ReverseGeocodeIntersection.ashx</DependentUpon>
-    </Compile>
     <Compile Include="ServerUrl.cs" />
     <Compile Include="SpatialReferenceManager.cs" />
     <Compile Include="Token.cs" />
@@ -97,9 +94,6 @@
     <Content Include="proxy.config">
       <SubType>Designer</SubType>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="ReverseGeocodeIntersection.ashx" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>

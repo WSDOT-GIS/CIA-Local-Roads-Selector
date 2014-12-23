@@ -537,7 +537,7 @@ require([
 		});
 
 		// Setup the locator.
-		locator = new IntersectionLocator(protocol + "ReverseGeocodeIntersection.ashx");
+		locator = new IntersectionLocator(protocol + "//geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode");
 		locator.setOutSpatialReference(map.spatialReference);
 
 
